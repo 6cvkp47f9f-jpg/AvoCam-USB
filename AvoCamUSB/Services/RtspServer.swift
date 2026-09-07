@@ -140,7 +140,7 @@ class RtspServer {
         rtspConnection.start()
     }
 
-    func removeConnection(_ connection: RTSPConnection) {
+    fileprivate func removeConnection(_ connection: RTSPConnection) {
         connections.removeAll { $0 === connection }
         refreshClientCount()
     }
@@ -374,7 +374,7 @@ class RtspServer {
 // MARK: - 单个 RTSP 连接
 
 /// 一条 RTSP 客户端连接（状态机 + TCP interleaved 发送）
-private class RTSPConnection {
+fileprivate class RTSPConnection {
 
     let connection: NWConnection
     let queue: DispatchQueue

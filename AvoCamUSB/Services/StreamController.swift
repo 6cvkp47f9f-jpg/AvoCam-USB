@@ -272,12 +272,12 @@ class StreamController: ObservableObject {
         }
 
         // 编码回调直接在编码线程发送，不切主线程（减少线程切换，降低 CPU）
-        videoEncoder.onEncodedFrame = { [weak self] h264Data in
+        videoEncoder.onEncodedFrame = { [weak self] h264Data, pts in
             guard let self = self else { return }
             self.networkServer.sendVideo(h264Data)
             // WiFi 推流：同时发往 RTSP 服务器（OBS 媒体源 / VLC 直接拉流）
             if self.wifiEnabled {
-                self.rtspServer.publishVideo(h264Data)
+                self.rtspServer.publishVideo(h264Data, pts: pts)
             }
             self.framesInLastSecond += 1
             self.bytesInLastSecond += h264Data.count

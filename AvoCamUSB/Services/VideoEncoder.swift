@@ -16,7 +16,7 @@ class VideoEncoder {
     private let encoderQueue = DispatchQueue(label: "com.avocamusb.encoder.video")
 
     /// 编码后的 H.264 Annex-B 数据回调
-    var onEncodedFrame: ((Data) -> Void)?
+    var onEncodedFrame: ((Data, Double) -> Void)?
 
     /// 当前配置
     private(set) var width: Int = 1920
@@ -77,7 +77,8 @@ class VideoEncoder {
             kVTCompressionPropertyKey_RealTime: true,
             kVTCompressionPropertyKey_AverageBitRate: bitrate,
             kVTCompressionPropertyKey_DataRateLimits: [bitrate / 8, 1] as CFArray, // CBR恒定码率，计算量更平稳
-            kVTCompressionPropertyKey_MaxKeyFrameInterval: frameRate * 2, // 2秒一个关键帧，减少关键帧编码开销
+            kVTCompressionPropertyKey_MaxKeyFrameInterval: max(60, frameRate * 2), // 关键帧间隔帧数（下限60，避免实际帧率低时间隔过长）
+            kVTCompressionPropertyKey_MaxKeyFrameIntervalDuration: 2.0, // 关键帧间隔真实时间 2 秒（按实际帧率插关键帧，出错后快速恢复）
             kVTCompressionPropertyKey_AllowFrameReordering: false, // 无 B 帧
             kVTCompressionPropertyKey_PixelTransferProperties: [
                 "ScalingMode": "Trim"
@@ -179,7 +180,9 @@ class VideoEncoder {
         }
 
         // 直接在编码线程调用回调，不切主线程（减少线程切换，降低 CPU）
-        self.onEncodedFrame?(annexBData)
+        // 提取真实 PTS（秒），供 RTSP RTP 时间戳使用
+        let pts = CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sampleBuffer))
+        self.onEncodedFrame?(annexBData, pts)
     }
 
     /// 从 CMSampleBuffer 的格式描述中提取 SPS/PPS（Annex-B 格式）

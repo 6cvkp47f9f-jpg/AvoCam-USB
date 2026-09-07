@@ -152,7 +152,7 @@ class RtspServer {
     // MARK: - 发布媒体流
 
     /// 发布一帧 H.264（Annex-B 格式，含起始码）
-    func publishVideo(_ annexB: Data) {
+    func publishVideo(_ annexB: Data, pts: Double) {
         guard !annexB.isEmpty else { return }
         queue.async { [weak self] in
             guard let self = self else { return }
@@ -173,8 +173,14 @@ class RtspServer {
                 }
             }
 
+            // RTP 时间戳：按真实 PTS（秒 × 90000），保证单调递增，避免帧率声明与实际不符导致播放错乱（瀑布/幻影）
+            let rtpTime = (pts >= 0 && pts.isFinite) ? UInt32(pts * Double(self.videoClock)) : self.videoTimestamp
+            if rtpTime > self.videoTimestamp {
+                self.videoTimestamp = rtpTime
+            } else {
+                self.videoTimestamp &+= 1
+            }
             let timestamp = self.videoTimestamp
-            self.videoTimestamp &+= UInt32(self.videoClock / self.frameRate)
 
             for conn in playing {
                 let packets = Self.packetizeH264(

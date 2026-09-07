@@ -38,16 +38,24 @@ jobs:
           zip -r AvoCamUSB.ipa Payload
           rm -rf Payload
 
+      - name: Get Version
+        id: version
+        run: |
+          VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" AvoCamUSB/Resources/Info.plist)
+          BUILD=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" AvoCamUSB/Resources/Info.plist)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "build=${BUILD}" >> $GITHUB_OUTPUT
+
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: AvoCamUSB.ipa
+          name: AvoCamUSB-v${{ steps.version.outputs.version }}-b${{ steps.version.outputs.build }}
           path: AvoCamUSB.ipa
 
       - name: Upload App Bundle
         uses: actions/upload-artifact@v4
         with:
-          name: AvoCamUSB.app
+          name: AvoCamUSB-v${{ steps.version.outputs.version }}-b${{ steps.version.outputs.build }}.app
           path: build/Build/Products/Release-iphoneos/AvoCamUSB.app
       - name: Publish Release
         env:

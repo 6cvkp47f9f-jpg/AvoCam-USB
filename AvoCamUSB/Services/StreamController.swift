@@ -104,6 +104,7 @@ class StreamController: ObservableObject {
     private let kAutoStart = "avocam_auto_start"
     private let kAudioEnabled = "avocam_audio_enabled"
     private let kMinimalMode = "avocam_minimal_mode"
+    private let kWiFiEnabled = "avocam_wifi_enabled"
 
     // 自动启动
     @Published var autoStartOnLaunch: Bool = true {
@@ -119,6 +120,7 @@ class StreamController: ObservableObject {
     @Published var minimalMode: Bool = false {
         didSet { saveSettings() }
     }
+    @Published var wifiEnabled: Bool = true
 
     // 统计用变量
     private var streamStartTime: Date?
@@ -199,6 +201,9 @@ class StreamController: ObservableObject {
         if defaults.object(forKey: kMinimalMode) != nil {
             minimalMode = defaults.bool(forKey: kMinimalMode)
         }
+        if defaults.object(forKey: kWiFiEnabled) != nil {
+            wifiEnabled = defaults.bool(forKey: kWiFiEnabled)
+        }
     }
 
     private func saveSettings() {
@@ -209,6 +214,7 @@ class StreamController: ObservableObject {
         defaults.set(autoStartOnLaunch, forKey: kAutoStart)
         defaults.set(audioEnabled, forKey: kAudioEnabled)
         defaults.set(minimalMode, forKey: kMinimalMode)
+        defaults.set(wifiEnabled, forKey: kWiFiEnabled)
     }
 
     // MARK: - 格式列表
@@ -270,7 +276,9 @@ class StreamController: ObservableObject {
             guard let self = self else { return }
             self.networkServer.sendVideo(h264Data)
             // WiFi 推流：同时发往 RTSP 服务器（OBS 媒体源 / VLC 直接拉流）
-            self.rtspServer.publishVideo(h264Data)
+            if self.wifiEnabled {
+                self.rtspServer.publishVideo(h264Data)
+            }
             self.framesInLastSecond += 1
             self.bytesInLastSecond += h264Data.count
             // 极简模式下不更新 UI 计数
@@ -286,7 +294,9 @@ class StreamController: ObservableObject {
             guard let self = self, self.audioEnabled else { return }
             self.networkServer.sendAudio(aacData)
             // WiFi 推流：同时发往 RTSP 服务器
-            self.rtspServer.publishAudio(aacData)
+            if self.wifiEnabled {
+                self.rtspServer.publishAudio(aacData)
+            }
             if !self.minimalMode {
                 DispatchQueue.main.async {
                     self.audioFramesSent += 1
@@ -392,8 +402,10 @@ class StreamController: ObservableObject {
         // 4. 启动网络服务（Portal 2345，供 OBS 插件 USB 连接）
         networkServer.start()
 
-        // 5. 启动 RTSP 服务（8554，供 OBS 媒体源 / VLC 通过 WiFi 连接）
-        rtspServer.start(audioEnabled: audioEnabled, frameRate: Int(format.maxFrameRate))
+        // 5. 启动 RTSP 服务（8554，供 OBS 媒体源 / VLC 通过 WiFi 连接；仅 WiFi 推流开启时）
+        if wifiEnabled {
+            rtspServer.start(audioEnabled: audioEnabled, frameRate: Int(format.maxFrameRate))
+        }
 
         // 6. 延迟启动采集
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
@@ -460,6 +472,21 @@ class StreamController: ObservableObject {
     }
 
     /// 切换闪光灯
+    /// 切换 WiFi 推流开关（推流中立即生效）
+    func setWifiEnabled(_ enabled: Bool) {
+        wifiEnabled = enabled
+        saveSettings()
+        if isStreaming {
+            if enabled {
+                let format = availableFormats.indices.contains(selectedFormatIndex) ? availableFormats[selectedFormatIndex] : nil
+                let fps = format?.maxFrameRate ?? 30
+                rtspServer.start(audioEnabled: audioEnabled, frameRate: Int(fps))
+            } else {
+                rtspServer.stop()
+            }
+        }
+    }
+
     func toggleTorch() {
         guard isStreaming else { return }
         if captureManager.toggleTorch() {

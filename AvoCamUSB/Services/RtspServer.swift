@@ -156,6 +156,10 @@ class RtspServer {
         guard !annexB.isEmpty else { return }
         queue.async { [weak self] in
             guard let self = self else { return }
+            // 先检查是否有客户端在拉流，没有则直接跳过（不做 NAL 解析，省 CPU/电）
+            let playing = self.connections.filter { $0.isPlaying }
+            guard !playing.isEmpty else { return }
+
             let nals = Self.splitAnnexBNALs(annexB)
             guard !nals.isEmpty else { return }
 
@@ -168,9 +172,6 @@ class RtspServer {
                     self.pps = nal
                 }
             }
-
-            let playing = self.connections.filter { $0.isPlaying }
-            guard !playing.isEmpty else { return }
 
             let timestamp = self.videoTimestamp
             self.videoTimestamp &+= UInt32(self.videoClock / self.frameRate)

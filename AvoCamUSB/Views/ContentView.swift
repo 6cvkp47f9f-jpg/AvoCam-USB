@@ -255,6 +255,20 @@ struct ContentView: View {
                     .font(.caption)
                     .foregroundColor(.orange)
             }
+
+            // WiFi 推流开关（推流中可实时切换，立即生效）
+            Toggle(isOn: Binding(
+                get: { streamController.wifiEnabled },
+                set: { streamController.setWifiEnabled($0) }
+            )) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("WiFi 推流")
+                        .font(.subheadline)
+                    Text("关闭后仅 USB 推流更省电；开启后 OBS 媒体源可通过 rtsp 地址无线拉流")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
         }
         .padding()
         .background(Color(.systemGray6))

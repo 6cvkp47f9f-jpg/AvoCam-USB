@@ -115,7 +115,7 @@ class CaptureManager: NSObject {
             // 锁定帧率：min 和 max 都设为所选格式的最高帧率，光线不足时也不降帧。
             // 优先匹配 maxFrameRate 的 range，匹配不到则取第一个 range，保证一定锁定成功
             let targetDuration = selectedFormat.format.videoSupportedFrameRateRanges
-                .first(where: { \.maxFrameRate == selectedFormat.maxFrameRate })?
+                .first(where: { $0.maxFrameRate == selectedFormat.maxFrameRate })?
                 .minFrameDuration
                 ?? selectedFormat.format.videoSupportedFrameRateRanges.first?.minFrameDuration
             if let targetDuration = targetDuration {

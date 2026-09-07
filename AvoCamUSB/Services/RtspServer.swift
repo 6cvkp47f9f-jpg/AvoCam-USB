@@ -48,8 +48,8 @@ class RtspServer {
     private var pps: Data?
 
     /// RTP 时间戳（在 rtsp queue 上读写）
-    private var videoTimestamp: UInt32 = 0
-    private var audioTimestamp: UInt32 = 0
+    private(set) var videoTimestamp: UInt32 = 0
+    private(set) var audioTimestamp: UInt32 = 0
 
     /// 客户端数量变化回调（主线程）
     var onClientCountChanged: ((Int) -> Void)?
@@ -140,12 +140,12 @@ class RtspServer {
         rtspConnection.start()
     }
 
-    private func removeConnection(_ connection: RTSPConnection) {
+    func removeConnection(_ connection: RTSPConnection) {
         connections.removeAll { $0 === connection }
         refreshClientCount()
     }
 
-    private func refreshClientCount() {
+    func refreshClientCount() {
         clientCount = connections.reduce(0) { $0 + ($1.isPlaying ? 1 : 0) }
     }
 
@@ -392,7 +392,7 @@ private class RTSPConnection {
     private let sessionID = String(format: "%08X", UInt32.random(in: 0..<UInt32.max))
 
     private var receiveBuffer = Data()
-    private var pendingInterleaved: (length: Int)?
+    private var pendingInterleavedLength: Int?
     private var lastCSeq = 0
 
     init(connection: NWConnection, queue: DispatchQueue, server: RtspServer) {
@@ -444,10 +444,10 @@ private class RTSPConnection {
     /// 解析 RTSP 请求与 interleaved（RTCP）数据
     private func processBuffer() {
         while true {
-            if let pending = pendingInterleaved {
-                if receiveBuffer.count >= pending.length {
-                    receiveBuffer.removeFirst(pending.length)
-                    pendingInterleaved = nil
+            if let pendingLength = pendingInterleavedLength {
+                if receiveBuffer.count >= pendingLength {
+                    receiveBuffer.removeFirst(pendingLength)
+                    pendingInterleavedLength = nil
                     continue
                 } else {
                     return
@@ -462,7 +462,7 @@ private class RTSPConnection {
                 let length = (Int(receiveBuffer[receiveBuffer.startIndex + 2]) << 8)
                     | Int(receiveBuffer[receiveBuffer.startIndex + 3])
                 receiveBuffer.removeFirst(4)
-                pendingInterleaved = (length)
+                pendingInterleavedLength = length
                 continue
             }
 

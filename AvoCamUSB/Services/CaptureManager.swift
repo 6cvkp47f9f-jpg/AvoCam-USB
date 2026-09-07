@@ -84,7 +84,7 @@ class CaptureManager: NSObject {
         }
 
         // 设置会话预设（使用 high，因为我们通过 activeFormat 手动设置最高规格）
-        captureSession.sessionPreset = .high
+        captureSession.sessionPreset = .inputPriority // 使用 activeFormat 完全生效，不受 preset 帧率限制（high preset 会强制 30fps）
 
         // 获取摄像头设备
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position) else {

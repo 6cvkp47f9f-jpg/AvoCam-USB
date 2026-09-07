@@ -112,12 +112,15 @@ class CaptureManager: NSObject {
             // 设置活动格式
             device.activeFormat = selectedFormat.format
 
-            // 锁定帧率：min 和 max 都设为所选格式的最高帧率，光线不足时也不降帧
-            if let frameRateRange = selectedFormat.format.videoSupportedFrameRateRanges.first(where: {
-                $0.maxFrameRate == selectedFormat.maxFrameRate
-            }) {
-                device.activeVideoMinFrameDuration = frameRateRange.minFrameDuration
-                device.activeVideoMaxFrameDuration = frameRateRange.minFrameDuration
+            // 锁定帧率：min 和 max 都设为所选格式的最高帧率，光线不足时也不降帧。
+            // 优先匹配 maxFrameRate 的 range，匹配不到则取第一个 range，保证一定锁定成功
+            let targetDuration = selectedFormat.format.videoSupportedFrameRateRanges
+                .first(where: { \.maxFrameRate == selectedFormat.maxFrameRate })?
+                .minFrameDuration
+                ?? selectedFormat.format.videoSupportedFrameRateRanges.first?.minFrameDuration
+            if let targetDuration = targetDuration {
+                device.activeVideoMinFrameDuration = targetDuration
+                device.activeVideoMaxFrameDuration = targetDuration
             }
 
             // 自动对焦、自动曝光、自动白平衡（系统默认开启，这里显式确认）

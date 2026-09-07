@@ -39,6 +39,7 @@ class StreamController: ObservableObject {
     private let videoEncoder = VideoEncoder()
     private let audioManager = AudioManager()
     private let networkServer = NetworkServer()
+    private let rtspServer = RtspServer()
 
     // 状态锁，防止并发 start/stop 导致闪退
     private let stateLock = NSLock()
@@ -46,6 +47,11 @@ class StreamController: ObservableObject {
     // 状态
     @Published var isStreaming: Bool = false
     @Published var isConnected: Bool = false
+
+    /// WiFi 推流地址列表（rtsp://<IP>:8554/live），供界面显示
+    var rtspAddresses: [String] {
+        NetworkInfo.ipv4Addresses().map { "rtsp://\($0):\(RtspServer.defaultPort)/live" }
+    }
     @Published var currentFormat: String = "检测中..."
     @Published var deviceName: String = ""
     @Published var videoFramesSent: Int = 0
@@ -263,6 +269,8 @@ class StreamController: ObservableObject {
         videoEncoder.onEncodedFrame = { [weak self] h264Data in
             guard let self = self else { return }
             self.networkServer.sendVideo(h264Data)
+            // WiFi 推流：同时发往 RTSP 服务器（OBS 媒体源 / VLC 直接拉流）
+            self.rtspServer.publishVideo(h264Data)
             self.framesInLastSecond += 1
             self.bytesInLastSecond += h264Data.count
             // 极简模式下不更新 UI 计数
@@ -277,6 +285,8 @@ class StreamController: ObservableObject {
         audioManager.onEncodedAudio = { [weak self] aacData in
             guard let self = self, self.audioEnabled else { return }
             self.networkServer.sendAudio(aacData)
+            // WiFi 推流：同时发往 RTSP 服务器
+            self.rtspServer.publishAudio(aacData)
             if !self.minimalMode {
                 DispatchQueue.main.async {
                     self.audioFramesSent += 1
@@ -286,9 +296,21 @@ class StreamController: ObservableObject {
 
         networkServer.onConnectionStateChanged = { [weak self] connected in
             DispatchQueue.main.async {
-                self?.isConnected = connected
+                self?.updateConnectedState()
             }
         }
+
+        // WiFi（RTSP）客户端数量变化
+        rtspServer.onClientCountChanged = { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.updateConnectedState()
+            }
+        }
+    }
+
+    /// 合并 USB（Portal）与 WiFi（RTSP）连接状态
+    private func updateConnectedState() {
+        isConnected = networkServer.isConnected || rtspServer.clientCount > 0
     }
 
     // MARK: - 统计
@@ -367,10 +389,13 @@ class StreamController: ObservableObject {
             audioManager.configure()
         }
 
-        // 4. 启动网络服务
+        // 4. 启动网络服务（Portal 2345，供 OBS 插件 USB 连接）
         networkServer.start()
 
-        // 5. 延迟启动采集
+        // 5. 启动 RTSP 服务（8554，供 OBS 媒体源 / VLC 通过 WiFi 连接）
+        rtspServer.start(audioEnabled: audioEnabled, frameRate: Int(format.maxFrameRate))
+
+        // 6. 延迟启动采集
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
             guard let self = self else { return }
             self.captureManager.start(audioEnabled: self.audioEnabled)
@@ -398,6 +423,7 @@ class StreamController: ObservableObject {
             audioManager.stop()
         }
         networkServer.stop()
+        rtspServer.stop()
         stopStats()
 
         if isScreenDimmed {

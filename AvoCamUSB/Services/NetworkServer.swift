@@ -2,7 +2,7 @@
 //  NetworkServer.swift
 //  AvoCamUSB
 //
-//  网络服务 - 监听 2345 端口，通过 USB 隧道与 OBS 插件通信
+//  网络服务 - 监听 2345 端口，通过 USB 隧道与 OBS 插件通信，并通过 Bonjour 在局域网广播
 //
 
 import Network
@@ -64,6 +64,16 @@ class NetworkServer {
             let listener = try NWListener(using: params, on: NWEndpoint.Port(rawValue: port)!)
             self.listener = listener
 
+            // Bonjour 局域网广播（Info.plist 已声明 _avocamusb._tcp）
+            // 让同一 WiFi 下的电脑可以发现本设备的 2345 端口（Portal 协议推流）
+            let serviceName = Self.bonjourServiceName()
+            listener.service = NWListener.Service(
+                name: serviceName,
+                type: "_avocamusb._tcp",
+                domain: "local."
+            )
+            avoPrint("[NetworkServer] Bonjour 广播: \(serviceName)._avocamusb._tcp.local.")
+
             listener.stateUpdateHandler = { [weak self] state in
                 switch state {
                 case .ready:
@@ -106,6 +116,28 @@ class NetworkServer {
             // 重新创建
             self.setupListener()
         }
+    }
+
+    // MARK: - Bonjour 服务名
+
+    /// 生成 Bonjour 服务名：AvoCamUSB-<设备型号>（只保留字母数字与连字符，不超过 40 字符）
+    static func bonjourServiceName() -> String {
+        var name = "AvoCamUSB"
+        let device = CameraCapabilities.getDeviceName()
+        let allowed = device.unicodeScalars.map { scalar -> Character in
+            if CharacterSet.alphanumerics.contains(scalar) || scalar == "-" {
+                return Character(scalar)
+            }
+            return "-"
+        }
+        let cleaned = String(allowed).replacingOccurrences(of: "--", with: "-")
+        if !cleaned.isEmpty {
+            name += "-" + cleaned
+        }
+        if name.count > 40 {
+            name = String(name.prefix(40))
+        }
+        return name
     }
 
     // MARK: - 连接处理

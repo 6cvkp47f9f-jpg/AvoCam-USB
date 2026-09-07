@@ -18,12 +18,12 @@ struct ContentView: View {
                 VStack(spacing: 20) {
 
                     // 标题
-                    Text("iPhone USB 虚拟摄像头")
+                    Text("iPhone USB / WiFi 虚拟摄像头")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .padding(.top)
 
-                    Text("通过 USB 数据线将 iPhone 摄像头作为电脑虚拟摄像头")
+                    Text("通过 USB 数据线或 WiFi 将 iPhone 摄像头作为电脑虚拟摄像头")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -291,15 +291,36 @@ struct ContentView: View {
                 Text("连接方式")
                     .foregroundColor(.secondary)
                 Spacer()
-                Text("USB 有线")
+                Text("USB 有线 / WiFi 无线")
                     .fontWeight(.medium)
+            }
+
+            HStack {
+                Text("局域网 IP")
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(NetworkInfo.ipv4Addresses().isEmpty ? "未连接 WiFi" : NetworkInfo.ipv4Addresses().joined(separator: " "))
+                    .fontWeight(.medium)
+            }
+
+            if let ip = NetworkInfo.wifiIP() {
+                HStack {
+                    Text("WiFi 推流地址")
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Text("rtsp://\(ip):\(RtspServer.defaultPort)/live")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.blue)
+                        .multilineTextAlignment(.trailing)
+                }
             }
 
             HStack {
                 Text("监听端口")
                     .foregroundColor(.secondary)
                 Spacer()
-                Text("2345")
+                Text("2345 (USB) / \(RtspServer.defaultPort) (WiFi)")
                     .fontWeight(.medium)
             }
         }
@@ -409,6 +430,10 @@ struct ContentView: View {
 
             Divider()
 
+            Text("USB 有线连接（OBS 插件）")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+
             VStack(alignment: .leading, spacing: 8) {
                 stepView(number: 1, text: "用数据线将 iPhone 连接到电脑")
                 stepView(number: 2, text: "在 iPhone 上点击「信任此电脑」")
@@ -419,6 +444,26 @@ struct ContentView: View {
                 stepView(number: 7, text: "启动 OBS 虚拟摄像头，在抖音直播伴侣中选择")
                 stepView(number: 8, text: "推流中可点击「息屏」降低屏幕发热，快速双击屏幕中央唤醒")
             }
+
+            Divider()
+
+            Text("WiFi 无线连接（OBS 媒体源 / VLC）")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+
+            VStack(alignment: .leading, spacing: 8) {
+                stepView(number: 1, text: "iPhone 与电脑连接到同一个 WiFi")
+                stepView(number: 2, text: "打开 App 并点击「开始推流」，记下「WiFi 推流地址」（如上所示）")
+                stepView(number: 3, text: "在电脑端 OBS 中添加「媒体源」，输入该 rtsp 地址")
+                stepView(number: 4, text: "勾选「网络缓冲」后点击播放，无需数据线即可看到画面")
+                stepView(number: 5, text: "也可用 VLC 播放器直接打开该 rtsp 地址验证")
+            }
+
+            Divider()
+
+            Text("提示：USB 与 WiFi 两种方式可同时使用；WiFi 画质取决于路由器与信号强度。")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
         .padding()
         .background(Color(.systemGray6))

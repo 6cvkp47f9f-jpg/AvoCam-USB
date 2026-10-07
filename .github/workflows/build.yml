@@ -1,68 +1,45 @@
-name: Build iOS App
-
+name: Build English iOS App
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
-
+permissions:
+  contents: read
 jobs:
   build:
     runs-on: macos-latest
+    timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
+      - name: Apply English interface and timestamp fix
+        run: git apply --check english-camera.patch && git apply english-camera.patch
+      - name: Check timestamp rollover arithmetic
+        run: swift TimestampTests.swift
       - name: Install XcodeGen
         run: brew install xcodegen
-
-      - name: Generate Xcode Project
+      - name: Generate Xcode project
         run: xcodegen generate
-
-      - name: Build (No Signing)
-        run: |
-          xcodebuild \
-            -project AvoCamUSB.xcodeproj \
-            -scheme AvoCamUSB \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            build
-
+      - name: Build unsigned iPhone app
+        run: xcodebuild -project AvoCamUSB.xcodeproj -scheme AvoCamUSB -configuration Release -destination 'generic/platform=iOS' -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
       - name: Package IPA
         run: |
           mkdir -p Payload
-          cp -r build/Build/Products/Release-iphoneos/AvoCamUSB.app Payload/
-          zip -r AvoCamUSB.ipa Payload
-          rm -rf Payload
-
-      - name: Get Version
-        id: version
-        run: |
-          VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" AvoCamUSB/Resources/Info.plist)
-          BUILD=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" AvoCamUSB/Resources/Info.plist)
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "build=${BUILD}" >> $GITHUB_OUTPUT
-
-      - name: Upload IPA
+          cp -R build/Build/Products/Release-iphoneos/AvoCamUSB.app Payload/
+          zip -r AvoCamUSB-English-v1.5.1-b7.ipa Payload
+      - name: Upload English IPA
         uses: actions/upload-artifact@v4
         with:
-          name: AvoCamUSB-v${{ steps.version.outputs.version }}-b${{ steps.version.outputs.build }}
-          path: AvoCamUSB.ipa
-
-      - name: Upload App Bundle
+          name: AvoCamUSB-English-v1.5.1-b7
+          path: AvoCamUSB-English-v1.5.1-b7.ipa
+          if-no-files-found: error
+      - name: Upload patched source
         uses: actions/upload-artifact@v4
         with:
-          name: AvoCamUSB-v${{ steps.version.outputs.version }}-b${{ steps.version.outputs.build }}.app
-          path: build/Build/Products/Release-iphoneos/AvoCamUSB.app
-      - name: Publish Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create v1.2 \
-            --repo ${{ github.repository }} \
-            --title "AvoCamUSB v1.2" \
-            --notes "锁定采集帧率版本" \
-            AvoCamUSB.ipa || true
+          name: AvoCamUSB-English-source
+          path: |
+            AvoCamUSB/
+            AvoCamUSBTests/
+            project.yml
+            README.md
+            english-camera.patch
+            TimestampTests.swift

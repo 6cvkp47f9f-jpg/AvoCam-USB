@@ -1,0 +1,1117 @@
+--- a/AvoCamUSB/Models/PortalProtocol.swift
++++ b/AvoCamUSB/Models/PortalProtocol.swift
+@@ -10,7 +10,7 @@
+ /// Portal 协议数据包类型
+ enum PortalPacketType: UInt32 {
+     case video = 101   // 视频包（H.264/HEVC Annex-B 格式）
+-    case audio = 102   // 音频包（AAC ADTS 格式）
++    case audio = 102   // audio包（AAC ADTS 格式）
+ }
+ 
+ /// Portal 协议帧头（16 字节）
+--- a/AvoCamUSB/Resources/Info.plist
++++ b/AvoCamUSB/Resources/Info.plist
+@@ -2,77 +2,77 @@
+ <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ <plist version="1.0">
+ <dict>
+-    <key>CFBundleDevelopmentRegion</key>
+-    <string>zh_CN</string>
+-    <key>CFBundleDisplayName</key>
+-    <string>AvoCam USB</string>
+-    <key>CFBundleExecutable</key>
+-    <string>$(EXECUTABLE_NAME)</string>
+-    <key>CFBundleIdentifier</key>
+-    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+-    <key>CFBundleInfoDictionaryVersion</key>
+-    <string>6.0</string>
+-    <key>CFBundleName</key>
+-    <string>$(PRODUCT_NAME)</string>
+-    <key>CFBundlePackageType</key>
+-    <string>APPL</string>
+-    <key>CFBundleShortVersionString</key>
+-    <string>1.5</string>
+-    <key>CFBundleVersion</key>
+-    <string>6</string>
+-    <key>LSRequiresIPhoneOS</key>
+-    <true/>
+-    <key>NSCameraUsageDescription</key>
+-    <string>需要访问摄像头以用于 USB / WiFi 虚拟摄像头直播</string>
+-    <key>NSMicrophoneUsageDescription</key>
+-    <string>需要访问麦克风以用于 USB / WiFi 虚拟摄像头直播音频</string>
+-    <key>NSLocalNetworkUsageDescription</key>
+-    <string>需要本地网络权限以通过 USB 或 WiFi 连接电脑进行视频传输</string>
+-    <key>UIApplicationSceneManifest</key>
+-    <dict>
+-        <key>UIApplicationSupportsMultipleScenes</key>
+-        <false/>
+-    </dict>
+-    <key>UIApplicationSupportsIndirectInputEvents</key>
+-    <true/>
+-    <key>UILaunchScreen</key>
+-    <dict/>
+-    <key>UIRequiredDeviceCapabilities</key>
+-    <array>
+-        <string>armv7</string>
+-    </array>
+-    <key>UIStatusBarStyle</key>
+-    <string>UIStatusBarStyleLightContent</string>
+-    <key>UISupportedInterfaceOrientations</key>
+-    <array>
+-        <string>UIInterfaceOrientationPortrait</string>
+-    </array>
+-    <key>UISupportedInterfaceOrientations~ipad</key>
+-    <array>
+-        <string>UIInterfaceOrientationPortrait</string>
+-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+-        <string>UIInterfaceOrientationLandscapeLeft</string>
+-        <string>UIInterfaceOrientationLandscapeRight</string>
+-    </array>
+-    <key>NSBonjourServices</key>
+-    <array>
+-        <string>_avocamusb._tcp</string>
+-    </array>
+-    <key>NSAppTransportSecurity</key>
+-    <dict>
+-        <key>NSAllowsArbitraryLoads</key>
+-        <true/>
+-        <key>NSAllowsLocalNetworking</key>
+-        <true/>
+-    </dict>
+-    <key>UIFileSharingEnabled</key>
+-    <true/>
+-    <key>UISupportsDocumentBrowser</key>
+-    <false/>
+-    <key>UIBackgroundModes</key>
+-    <array>
+-        <string>audio</string>
+-        <string>voip</string>
+-    </array>
++	<key>CFBundleDevelopmentRegion</key>
++	<string>zh_CN</string>
++	<key>CFBundleDisplayName</key>
++	<string>AvoCam USB</string>
++	<key>CFBundleExecutable</key>
++	<string>$(EXECUTABLE_NAME)</string>
++	<key>CFBundleIdentifier</key>
++	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
++	<key>CFBundleInfoDictionaryVersion</key>
++	<string>6.0</string>
++	<key>CFBundleName</key>
++	<string>$(PRODUCT_NAME)</string>
++	<key>CFBundlePackageType</key>
++	<string>APPL</string>
++	<key>CFBundleShortVersionString</key>
++	<string>1.5.1</string>
++	<key>CFBundleVersion</key>
++	<string>7</string>
++	<key>LSRequiresIPhoneOS</key>
++	<true/>
++	<key>NSCameraUsageDescription</key>
++	<string>Allow camera access to stream video over USB or Wi-Fi.</string>
++	<key>NSMicrophoneUsageDescription</key>
++	<string>Allow microphone access to include audio in your USB or Wi-Fi stream.</string>
++	<key>NSLocalNetworkUsageDescription</key>
++	<string>Allow local network access to stream video to your computer.</string>
++	<key>UIApplicationSceneManifest</key>
++	<dict>
++		<key>UIApplicationSupportsMultipleScenes</key>
++		<false/>
++	</dict>
++	<key>UIApplicationSupportsIndirectInputEvents</key>
++	<true/>
++	<key>UILaunchScreen</key>
++	<dict/>
++	<key>UIRequiredDeviceCapabilities</key>
++	<array>
++		<string>armv7</string>
++	</array>
++	<key>UIStatusBarStyle</key>
++	<string>UIStatusBarStyleLightContent</string>
++	<key>UISupportedInterfaceOrientations</key>
++	<array>
++		<string>UIInterfaceOrientationPortrait</string>
++	</array>
++	<key>UISupportedInterfaceOrientations~ipad</key>
++	<array>
++		<string>UIInterfaceOrientationPortrait</string>
++		<string>UIInterfaceOrientationPortraitUpsideDown</string>
++		<string>UIInterfaceOrientationLandscapeLeft</string>
++		<string>UIInterfaceOrientationLandscapeRight</string>
++	</array>
++	<key>NSBonjourServices</key>
++	<array>
++		<string>_avocamusb._tcp</string>
++	</array>
++	<key>NSAppTransportSecurity</key>
++	<dict>
++		<key>NSAllowsArbitraryLoads</key>
++		<true/>
++		<key>NSAllowsLocalNetworking</key>
++		<true/>
++	</dict>
++	<key>UIFileSharingEnabled</key>
++	<true/>
++	<key>UISupportsDocumentBrowser</key>
++	<false/>
++	<key>UIBackgroundModes</key>
++	<array>
++		<string>audio</string>
++		<string>voip</string>
++	</array>
+ </dict>
+ </plist>
+--- a/AvoCamUSB/Services/AudioManager.swift
++++ b/AvoCamUSB/Services/AudioManager.swift
+@@ -20,7 +20,7 @@
+ 
+     /// 音频配置
+     private let sampleRate: Double = 48000
+-    private let channels: AVAudioChannelCount = 1 // 单声道
++    private let channels: AVAudioChannelCount = 1 // 单channels
+     private let bitrate: Int = 64000 // 64 kbps
+     private let frameSize: AVAudioFrameCount = 1024 // AAC 每帧 1024 采样
+ 
+@@ -43,7 +43,7 @@
+             try session.setPreferredSampleRate(sampleRate)
+             try session.setActive(true)
+         } catch {
+-            print("[AudioManager] 配置音频会话失败: \(error)")
++            print("[AudioManager] Audio session configuration failed: \(error)")
+             return
+         }
+ 
+@@ -58,7 +58,7 @@
+             AVEncoderBitRateKey: bitrate,
+             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+         ]) else {
+-            print("[AudioManager] 创建 AAC 格式失败")
++            print("[AudioManager] Failed to create AAC format")
+             return
+         }
+ 
+@@ -71,7 +71,7 @@
+             self?.processAudioBuffer(buffer, time: time)
+         }
+ 
+-        print("[AudioManager] 音频引擎已配置: \(Int(sampleRate))Hz, \(channels)声道, \(bitrate/1000)kbps AAC")
++        print("[AudioManager] Audio engine configured: \(Int(sampleRate))Hz, \(channels)channels, \(bitrate/1000)kbps AAC")
+     }
+ 
+     // MARK: - 控制
+@@ -83,9 +83,9 @@
+             do {
+                 try self.audioEngine.start()
+                 self.isRunning = true
+-                print("[AudioManager] 音频采集已启动")
++                print("[AudioManager] Audio capture started")
+             } catch {
+-                print("[AudioManager] 启动音频引擎失败: \(error)")
++                print("[AudioManager] Failed to start audio engine: \(error)")
+             }
+         }
+     }
+@@ -97,7 +97,7 @@
+             self.audioEngine.stop()
+             self.audioEngine.inputNode.removeTap(onBus: 0)
+             self.isRunning = false
+-            print("[AudioManager] 音频采集已停止")
++            print("[AudioManager] Audio capture stopped")
+         }
+     }
+ 
+@@ -124,7 +124,7 @@
+ 
+         if status == .error {
+             if let error = error {
+-                print("[AudioManager] AAC 编码错误: \(error)")
++                print("[AudioManager] AAC encoding error: \(error)")
+             }
+             return
+         }
+--- a/AvoCamUSB/Services/BackgroundManager.swift
++++ b/AvoCamUSB/Services/BackgroundManager.swift
+@@ -43,7 +43,7 @@
+         // 3. 申请后台任务（额外保障）
+         beginBackgroundTask()
+ 
+-        print("[BackgroundManager] 后台保活已启动")
++        print("[BackgroundManager] Background keep-alive started")
+     }
+ 
+     /// 停止后台保活
+@@ -62,10 +62,10 @@
+         do {
+             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+         } catch {
+-            print("[BackgroundManager] 停止音频会话失败: \(error)")
++            print("[BackgroundManager] Failed to stop audio session: \(error)")
+         }
+ 
+-        print("[BackgroundManager] 后台保活已停止")
++        print("[BackgroundManager] Background keep-alive stopped")
+     }
+ 
+     // MARK: - 音频会话配置
+@@ -78,7 +78,7 @@
+             try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+             try session.setActive(true)
+         } catch {
+-            print("[BackgroundManager] 配置音频会话失败: \(error)")
++            print("[BackgroundManager] Audio session configuration failed: \(error)")
+         }
+     }
+ 
+@@ -93,7 +93,7 @@
+             audioPlayer?.prepareToPlay()
+             audioPlayer?.play()
+         } catch {
+-            print("[BackgroundManager] 创建音频播放器失败: \(error)")
++            print("[BackgroundManager] Failed to create audio player: \(error)")
+         }
+     }
+ 
+@@ -167,10 +167,10 @@
+         switch type {
+         case .began:
+             // 音频中断开始（如来电），暂停播放
+-            print("[BackgroundManager] 音频中断开始")
++            print("[BackgroundManager] Audio interruption began")
+         case .ended:
+             // 音频中断结束，恢复播放
+-            print("[BackgroundManager] 音频中断结束，恢复播放")
++            print("[BackgroundManager] Audio interruption ended; resuming playback")
+             if isActive {
+                 configureAudioSession()
+                 startSilencePlayback()
+--- a/AvoCamUSB/Services/CaptureManager.swift
++++ b/AvoCamUSB/Services/CaptureManager.swift
+@@ -88,7 +88,7 @@
+ 
+         // 获取摄像头设备
+         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position) else {
+-            print("[CaptureManager] 无法获取摄像头设备")
++            print("[CaptureManager] Unable to obtain camera device")
+             return
+         }
+ 
+@@ -98,7 +98,7 @@
+             selectedFormat = format
+         } else {
+             guard let bestFormat = CameraCapabilities.selectBestFormat(position: position) else {
+-                print("[CaptureManager] 无法获取支持的格式")
++                print("[CaptureManager] No supported camera format found")
+                 return
+             }
+             selectedFormat = bestFormat
+@@ -136,9 +136,9 @@
+ 
+             device.unlockForConfiguration()
+ 
+-            print("[CaptureManager] 已配置摄像头: \(selectedFormat)")
++            print("[CaptureManager] Camera configured: \(selectedFormat)")
+         } catch {
+-            print("[CaptureManager] 配置摄像头失败: \(error)")
++            print("[CaptureManager] Camera configuration failed: \(error)")
+             return
+         }
+ 
+@@ -149,7 +149,7 @@
+                 captureSession.addInput(videoInput)
+             }
+         } catch {
+-            print("[CaptureManager] 添加视频输入失败: \(error)")
++            print("[CaptureManager] Failed to add video input: \(error)")
+         }
+ 
+         // 配置视频输出
+@@ -181,7 +181,7 @@
+             // 根据音频开关决定是否添加音频输入输出
+             self.configureAudio(audioEnabled: audioEnabled)
+             self.captureSession.startRunning()
+-            print("[CaptureManager] 采集已启动, 音频: \(audioEnabled ? "开" : "关")")
++            print("[CaptureManager] Capture started, audio: \(audioEnabled ? "on" : "off")")
+         }
+     }
+ 
+@@ -213,7 +213,7 @@
+                         captureSession.addInput(audioInput)
+                     }
+                 } catch {
+-                    print("[CaptureManager] 添加音频输入失败: \(error)")
++                    print("[CaptureManager] Failed to add audio input: \(error)")
+                 }
+             }
+             // 添加音频输出
+@@ -228,7 +228,7 @@
+         sessionQueue.async { [weak self] in
+             guard let self = self, self.captureSession.isRunning else { return }
+             self.captureSession.stopRunning()
+-            print("[CaptureManager] 采集已停止")
++            print("[CaptureManager] Capture stopped")
+         }
+     }
+ 
+@@ -241,14 +241,14 @@
+     /// 切换闪光灯（仅后置摄像头支持）
+     func toggleTorch() -> Bool {
+         guard currentPosition == .back else {
+-            print("[CaptureManager] 前置摄像头无闪光灯")
++            print("[CaptureManager] The front camera has no torch")
+             return false
+         }
+         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
+             return false
+         }
+         guard device.hasTorch else {
+-            print("[CaptureManager] 设备不支持闪光灯")
++            print("[CaptureManager] This device does not support the torch")
+             return false
+         }
+ 
+@@ -262,10 +262,10 @@
+                 isTorchOn = true
+             }
+             device.unlockForConfiguration()
+-            print("[CaptureManager] 闪光灯已\(isTorchOn ? "开启" : "关闭")")
++            print("[CaptureManager] Torch state: \(isTorchOn ? "on" : "off")")
+             return true
+         } catch {
+-            print("[CaptureManager] 切换闪光灯失败: \(error)")
++            print("[CaptureManager] Failed to toggle torch: \(error)")
+             return false
+         }
+     }
+@@ -283,15 +283,15 @@
+             device.videoZoomFactor = clampedFactor
+             device.unlockForConfiguration()
+             currentZoomFactor = clampedFactor
+-            print("[CaptureManager] 缩放设置为: \(String(format: "%.1f", clampedFactor))x")
++            print("[CaptureManager] Zoom set to: \(String(format: "%.1f", clampedFactor))x")
+         } catch {
+-            print("[CaptureManager] 设置缩放失败: \(error)")
++            print("[CaptureManager] Failed to set zoom: \(error)")
+         }
+     }
+ 
+     /// 获取当前分辨率和帧率描述
+     var currentFormatDescription: String {
+-        guard let info = currentFormatInfo else { return "未配置" }
++        guard let info = currentFormatInfo else { return "Not configured" }
+         return "\(info.width)x\(info.height) @ \(Int(info.maxFrameRate))fps"
+     }
+ }
+--- a/AvoCamUSB/Services/NetworkServer.swift
++++ b/AvoCamUSB/Services/NetworkServer.swift
+@@ -47,7 +47,7 @@
+             self.listener = nil
+             self.isConnected = false
+             self.onConnectionStateChanged?(false)
+-            avoPrint("[NetworkServer] 已停止监听")
++            avoPrint("[NetworkServer] Listener stopped")
+         }
+     }
+ 
+@@ -72,18 +72,18 @@
+                 type: "_avocamusb._tcp",
+                 domain: "local."
+             )
+-            avoPrint("[NetworkServer] Bonjour 广播: \(serviceName)._avocamusb._tcp.local.")
++            avoPrint("[NetworkServer] Bonjour announcement: \(serviceName)._avocamusb._tcp.local.")
+ 
+             listener.stateUpdateHandler = { [weak self] state in
+                 switch state {
+                 case .ready:
+-                    avoPrint("[NetworkServer] 正在监听端口 \(self?.port ?? 0)")
++                    avoPrint("[NetworkServer] Listening on port \(self?.port ?? 0)")
+                 case .failed(let error):
+-                    avoPrint("[NetworkServer] 监听失败: \(error)")
++                    avoPrint("[NetworkServer] Listener failed: \(error)")
+                     // 自动重连
+                     self?.attemptReconnect()
+                 case .cancelled:
+-                    avoPrint("[NetworkServer] 监听已取消")
++                    avoPrint("[NetworkServer] Listener cancelled")
+                     // 如果应该运行但被取消，自动重连
+                     if self?.shouldRun == true {
+                         self?.attemptReconnect()
+@@ -99,7 +99,7 @@
+ 
+             listener.start(queue: queue)
+         } catch {
+-            avoPrint("[NetworkServer] 创建监听器失败: \(error)")
++            avoPrint("[NetworkServer] Failed to create listener: \(error)")
+             attemptReconnect()
+         }
+     }
+@@ -107,7 +107,7 @@
+     /// 自动重连
+     private func attemptReconnect() {
+         guard shouldRun else { return }
+-        avoPrint("[NetworkServer] 2秒后尝试重连...")
++        avoPrint("[NetworkServer] Reconnecting in 2 seconds...")
+         queue.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+             guard let self = self, self.shouldRun else { return }
+             // 清理旧的 listener
+@@ -143,7 +143,7 @@
+     // MARK: - 连接处理
+ 
+     private func handleNewConnection(_ connection: NWConnection) {
+-        avoPrint("[NetworkServer] 新客户端连接")
++        avoPrint("[NetworkServer] New client connection")
+ 
+         connections.append(connection)
+         isConnected = true
+@@ -152,12 +152,12 @@
+         connection.stateUpdateHandler = { [weak self] state in
+             switch state {
+             case .ready:
+-                avoPrint("[NetworkServer] 客户端连接就绪")
++                avoPrint("[NetworkServer] Client connection ready")
+             case .failed(let error):
+-                avoPrint("[NetworkServer] 客户端连接失败: \(error)")
++                avoPrint("[NetworkServer] Client connection failed: \(error)")
+                 self?.removeConnection(connection)
+             case .cancelled:
+-                avoPrint("[NetworkServer] 客户端连接已取消")
++                avoPrint("[NetworkServer] Client connection cancelled")
+                 self?.removeConnection(connection)
+             default:
+                 break
+@@ -188,7 +188,7 @@
+             for connection in self.connections {
+                 connection.send(content: data, completion: .contentProcessed { error in
+                     if let error = error {
+-                        avoPrint("[NetworkServer] 发送数据失败: \(error)")
++                        avoPrint("[NetworkServer] Failed to send data: \(error)")
+                     }
+                 })
+             }
+--- a/AvoCamUSB/Services/RtspServer.swift
++++ b/AvoCamUSB/Services/RtspServer.swift
+@@ -106,9 +106,9 @@
+             listener.stateUpdateHandler = { [weak self] state in
+                 switch state {
+                 case .ready:
+-                    avoPrint("[RtspServer] 正在监听端口 \(RtspServer.defaultPort)（WiFi 推流）")
++                    avoPrint("[RtspServer] Listening on port \(RtspServer.defaultPort)（Wi-Fi streaming）")
+                 case .failed(let error):
+-                    avoPrint("[RtspServer] 监听失败: \(error)，2 秒后重试")
++                    avoPrint("[RtspServer] Listener failed: \(error); retrying in 2 seconds")
+                     self?.queue.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                         guard let self = self, self.listener != nil else { return }
+                         self.listener?.cancel()
+@@ -126,7 +126,7 @@
+ 
+             listener.start(queue: queue)
+         } catch {
+-            avoPrint("[RtspServer] 创建监听器失败: \(error)")
++            avoPrint("[RtspServer] Failed to create listener: \(error)")
+         }
+     }
+ 
+@@ -174,9 +174,13 @@
+             }
+ 
+             // RTP 时间戳：按真实 PTS（秒 × 90000），保证单调递增，避免帧率声明与实际不符导致播放错乱（瀑布/幻影）
+-            let rtpTime = (pts >= 0 && pts.isFinite) ? UInt32(pts * Double(self.videoClock)) : self.videoTimestamp
+-            if rtpTime > self.videoTimestamp {
+-                self.videoTimestamp = rtpTime
++            // RTP timestamps wrap modulo 2^32. A direct UInt32 conversion
++            // traps after about 13.26 hours of capture-clock time.
++            let ticks = pts * Double(self.videoClock)
++            if pts >= 0 && ticks.isFinite {
++                self.videoTimestamp = UInt32(
++                    ticks.rounded(.down).truncatingRemainder(dividingBy: 4_294_967_296.0)
++                )
+             } else {
+                 self.videoTimestamp &+= 1
+             }
+--- a/AvoCamUSB/Services/ScreenDimmer.swift
++++ b/AvoCamUSB/Services/ScreenDimmer.swift
+@@ -52,7 +52,7 @@
+         UIApplication.shared.isIdleTimerDisabled = true
+ 
+         lastTapTime = nil
+-        avoPrint("[ScreenDimmer] 息屏已开启（防误触：快速双击屏幕中央唤醒）")
++        avoPrint("[ScreenDimmer] Screen dimmed; double-tap the center to wake")
+     }
+ 
+     /// 关闭息屏（恢复亮度+移除覆盖）
+@@ -71,7 +71,7 @@
+         UIApplication.shared.isIdleTimerDisabled = false
+ 
+         lastTapTime = nil
+-        avoPrint("[ScreenDimmer] 息屏已关闭")
++        avoPrint("[ScreenDimmer] Screen restored")
+     }
+ 
+     /// 切换息屏状态
+@@ -95,10 +95,10 @@
+                             abs(location.y - center.y) <= halfSize
+ 
+         if isInWakeArea {
+-            avoPrint("[ScreenDimmer] 检测到中央区域双击，唤醒屏幕")
++            avoPrint("[ScreenDimmer] Center double-tap detected; waking screen")
+             disengage()
+         } else {
+-            avoPrint("[ScreenDimmer] 点击在唤醒区域外，忽略（防误触）")
++            avoPrint("[ScreenDimmer] Ignoring tap outside the wake area")
+         }
+     }
+ }
+--- a/AvoCamUSB/Services/StreamController.swift
++++ b/AvoCamUSB/Services/StreamController.swift
+@@ -19,8 +19,8 @@
+ 
+ /// 视频方向
+ enum VideoOrientation: String, CaseIterable, Identifiable {
+-    case landscape = "横屏"
+-    case portrait = "竖屏"
++    case landscape = "Landscape"
++    case portrait = "Portrait"
+     var id: String { rawValue }
+ }
+ 
+@@ -52,7 +52,7 @@
+     var rtspAddresses: [String] {
+         NetworkInfo.ipv4Addresses().map { "rtsp://\($0):\(RtspServer.defaultPort)/live" }
+     }
+-    @Published var currentFormat: String = "检测中..."
++    @Published var currentFormat: String = "Detecting..."
+     @Published var deviceName: String = ""
+     @Published var videoFramesSent: Int = 0
+     @Published var audioFramesSent: Int = 0
+@@ -164,13 +164,13 @@
+     @objc private func handleDidEnterBackground() {
+         // 进入后台时记录是否在推流
+         wasStreamingBeforeBackground = isStreaming
+-        avoPrint("[StreamController] 进入后台，推流状态: \(isStreaming)")
++        avoPrint("[StreamController] Entered background; streaming: \(isStreaming)")
+     }
+ 
+     @objc private func handleWillEnterForeground() {
+         // 切回前台时，如果之前在推流但现在停止了，自动恢复
+         if wasStreamingBeforeBackground && !isStreaming {
+-            avoPrint("[StreamController] 切回前台，自动恢复推流")
++            avoPrint("[StreamController] Entered foreground; resuming stream")
+             start()
+         }
+     }
+@@ -185,7 +185,7 @@
+             currentFormat = availableFormats[savedFormat].description
+         }
+         if let orientationRaw = defaults.string(forKey: kOrientation),
+-           let orientation = VideoOrientation(rawValue: orientationRaw) {
++           let orientation = VideoOrientation(rawValue: ["\u{6A2A}\u{5C4F}": "Landscape", "\u{7AD6}\u{5C4F}": "Portrait"][orientationRaw] ?? orientationRaw) {
+             selectedOrientation = orientation
+         }
+         let savedBitrate = defaults.integer(forKey: kBitrateIndex)
+@@ -369,7 +369,7 @@
+         defer { stateLock.unlock() }
+ 
+         guard !isStreaming else {
+-            avoPrint("[StreamController] 已在推流，忽略重复 start")
++            avoPrint("[StreamController] Already streaming; ignoring duplicate start")
+             return
+         }
+ 
+@@ -416,7 +416,7 @@
+             }
+             self.isStreaming = true
+             self.startStats()
+-            avoPrint("[StreamController] 直播流已启动，码率: \(bitrate / 1_000_000)Mbps, 方向: \(self.selectedOrientation.rawValue), 音频: \(self.audioEnabled ? "开" : "关"), 极简模式: \(self.minimalMode ? "开" : "关")")
++            avoPrint("[StreamController] Stream started; bitrate: \(bitrate / 1_000_000)Mbps, orientation: \(self.selectedOrientation.rawValue), audio: \(self.audioEnabled ? "on" : "off"), minimal mode: \(self.minimalMode ? "on" : "off")")
+         }
+     }
+ 
+@@ -426,7 +426,7 @@
+         defer { stateLock.unlock() }
+ 
+         guard isStreaming else {
+-            avoPrint("[StreamController] 未在推流，忽略重复 stop")
++            avoPrint("[StreamController] Not streaming; ignoring duplicate stop")
+             return
+         }
+ 
+@@ -445,7 +445,7 @@
+         isStreaming = false
+         videoFramesSent = 0
+         audioFramesSent = 0
+-        avoPrint("[StreamController] 直播流已停止")
++        avoPrint("[StreamController] Stream stopped")
+     }
+ 
+     /// 切换前后摄像头
+--- a/AvoCamUSB/Services/VideoEncoder.swift
++++ b/AvoCamUSB/Services/VideoEncoder.swift
+@@ -65,7 +65,7 @@
+         )
+ 
+         guard status == noErr, let compressionSession = session else {
+-            print("[VideoEncoder] 创建压缩会话失败: \(status)")
++            print("[VideoEncoder] Failed to create compression session: \(status)")
+             return
+         }
+ 
+@@ -96,7 +96,7 @@
+         // 准备编码
+         VTCompressionSessionPrepareToEncodeFrames(compressionSession)
+ 
+-        print("[VideoEncoder] 编码器已创建: \(width)x\(height) @ \(frameRate)fps, \(bitrate / 1_000_000)Mbps")
++        print("[VideoEncoder] Encoder created: \(width)x\(height) @ \(frameRate)fps, \(bitrate / 1_000_000)Mbps")
+     }
+ 
+     private func destroySession() {
+@@ -129,7 +129,7 @@
+             )
+ 
+             if status != noErr {
+-                print("[VideoEncoder] 编码帧失败: \(status)")
++                print("[VideoEncoder] Frame encoding failed: \(status)")
+             }
+         }
+     }
+@@ -144,7 +144,7 @@
+ 
+         // 获取编码数据
+         guard let dataBuffer = CMSampleBufferGetDataBuffer(sampleBuffer) else {
+-            print("[VideoEncoder] 无法获取 dataBuffer")
++            print("[VideoEncoder] Unable to obtain dataBuffer")
+             return
+         }
+ 
+@@ -159,7 +159,7 @@
+         )
+ 
+         guard status == noErr, let pointer = dataPointer else {
+-            print("[VideoEncoder] 无法获取数据指针: \(status)")
++            print("[VideoEncoder] Unable to obtain data pointer: \(status)")
+             return
+         }
+ 
+@@ -173,9 +173,9 @@
+         if isKeyFrame {
+             if let spsPpsData = extractSPSPPS(from: sampleBuffer) {
+                 annexBData = spsPpsData + annexBData
+-                print("[VideoEncoder] 关键帧: 已添加 SPS/PPS (\(spsPpsData.count) 字节), 视频数据 \(annexBData.count) 字节")
++                print("[VideoEncoder] Keyframe: added SPS/PPS (\(spsPpsData.count) bytes), video data \(annexBData.count) bytes")
+             } else {
+-                print("[VideoEncoder] 关键帧: 无法提取 SPS/PPS!")
++                print("[VideoEncoder] Keyframe: unable to extract SPS/PPS!")
+             }
+         }
+ 
+@@ -206,7 +206,7 @@
+         )
+ 
+         guard status == noErr, parameterSetCount >= 2 else {
+-            print("[VideoEncoder] 获取参数集数量失败: \(status), count: \(parameterSetCount)")
++            print("[VideoEncoder] Failed to obtain parameter-set count: \(status), count: \(parameterSetCount)")
+             return nil
+         }
+ 
+@@ -241,7 +241,7 @@
+         }
+ 
+         guard let sps = spsData, let pps = ppsData else {
+-            print("[VideoEncoder] SPS 或 PPS 提取失败")
++            print("[VideoEncoder] SPS or PPS extraction failed")
+             return nil
+         }
+ 
+--- a/AvoCamUSB/Views/ContentView.swift
++++ b/AvoCamUSB/Views/ContentView.swift
+@@ -18,12 +18,12 @@
+                 VStack(spacing: 20) {
+ 
+                     // 标题
+-                    Text("iPhone USB / WiFi 虚拟摄像头")
++                    Text("iPhone USB / Wi-Fi Camera")
+                         .font(.largeTitle)
+                         .fontWeight(.bold)
+                         .padding(.top)
+ 
+-                    Text("通过 USB 数据线或 WiFi 将 iPhone 摄像头作为电脑虚拟摄像头")
++                    Text("Use your iPhone as a computer camera over USB or Wi-Fi.")
+                         .font(.subheadline)
+                         .foregroundColor(.secondary)
+                         .multilineTextAlignment(.center)
+@@ -68,7 +68,7 @@
+                     .font(.title2)
+                     .foregroundColor(streamController.isStreaming ? .green : .red)
+ 
+-                Text(streamController.isStreaming ? "正在推流" : "未推流")
++                Text(streamController.isStreaming ? "Streaming" : "Not streaming")
+                     .font(.headline)
+ 
+                 Spacer()
+@@ -76,7 +76,7 @@
+                 Circle()
+                     .fill(streamController.isConnected ? Color.green : Color.gray)
+                     .frame(width: 12, height: 12)
+-                Text(streamController.isConnected ? "电脑已连接" : "等待电脑连接")
++                Text(streamController.isConnected ? "Computer connected" : "Waiting for a computer")
+                     .font(.subheadline)
+                     .foregroundColor(.secondary)
+             }
+@@ -85,7 +85,7 @@
+ 
+             HStack {
+                 VStack(alignment: .leading, spacing: 4) {
+-                    Text("视频帧")
++                    Text("Video frames")
+                         .font(.caption)
+                         .foregroundColor(.secondary)
+                     Text("\(streamController.videoFramesSent)")
+@@ -94,7 +94,7 @@
+                 }
+                 Spacer()
+                 VStack(alignment: .trailing, spacing: 4) {
+-                    Text("音频帧")
++                    Text("Audio frames")
+                         .font(.caption)
+                         .foregroundColor(.secondary)
+                     Text("\(streamController.audioFramesSent)")
+@@ -112,17 +112,17 @@
+ 
+     private var statsCard: some View {
+         VStack(alignment: .leading, spacing: 10) {
+-            Label("推流统计", systemImage: "chart.bar")
++            Label("Stream statistics", systemImage: "chart.bar")
+                 .font(.headline)
+ 
+             Divider()
+ 
+             HStack {
+-                statItem(title: "推流时长", value: streamController.streamDuration)
+-                Spacer()
+-                statItem(title: "实时帧率", value: "\(streamController.currentFps) fps")
+-                Spacer()
+-                statItem(title: "实时码率", value: formatBitrate(streamController.currentBitrate))
++                statItem(title: "Duration", value: streamController.streamDuration)
++                Spacer()
++                statItem(title: "Frame rate", value: "\(streamController.currentFps) fps")
++                Spacer()
++                statItem(title: "Bitrate", value: formatBitrate(streamController.currentBitrate))
+             }
+         }
+         .padding()
+@@ -155,17 +155,17 @@
+ 
+     private var videoSettingsCard: some View {
+         VStack(alignment: .leading, spacing: 10) {
+-            Label("视频设置", systemImage: "slider.horizontal.3")
++            Label("Video settings", systemImage: "slider.horizontal.3")
+                 .font(.headline)
+ 
+             Divider()
+ 
+             // 分辨率和帧率选择器
+             VStack(alignment: .leading, spacing: 4) {
+-                Text("分辨率 / 帧率")
++                Text("Resolution / frame rate")
+                     .font(.caption)
+                     .foregroundColor(.secondary)
+-                Picker("分辨率 / 帧率", selection: Binding(
++                Picker("Resolution / frame rate", selection: Binding(
+                     get: { streamController.selectedFormatIndex },
+                     set: { streamController.selectFormat(at: $0) }
+                 )) {
+@@ -180,10 +180,10 @@
+ 
+             // 方向选择器
+             VStack(alignment: .leading, spacing: 4) {
+-                Text("视频方向")
++                Text("Orientation")
+                     .font(.caption)
+                     .foregroundColor(.secondary)
+-                Picker("视频方向", selection: $streamController.selectedOrientation) {
++                Picker("Orientation", selection: $streamController.selectedOrientation) {
+                     ForEach(VideoOrientation.allCases) { orientation in
+                         Text(orientation.rawValue).tag(orientation)
+                     }
+@@ -194,10 +194,10 @@
+ 
+             // 码率选择器
+             VStack(alignment: .leading, spacing: 4) {
+-                Text("编码码率")
++                Text("Encoding bitrate")
+                     .font(.caption)
+                     .foregroundColor(.secondary)
+-                Picker("编码码率", selection: $streamController.selectedBitrateIndex) {
++                Picker("Encoding bitrate", selection: $streamController.selectedBitrateIndex) {
+                     ForEach(0..<streamController.bitrateOptions.count, id: \.self) { index in
+                         Text(streamController.bitrateOptions[index].label).tag(index)
+                     }
+@@ -207,7 +207,7 @@
+             }
+ 
+             if streamController.isStreaming {
+-                Text("推流中无法切换设置，请先停止推流")
++                Text("Stop streaming before changing these settings.")
+                     .font(.caption)
+                     .foregroundColor(.orange)
+             }
+@@ -221,7 +221,7 @@
+ 
+     private var powerSavingCard: some View {
+         VStack(alignment: .leading, spacing: 10) {
+-            Label("功耗优化", systemImage: "bolt.fill")
++            Label("Power saving", systemImage: "bolt.fill")
+                 .font(.headline)
+ 
+             Divider()
+@@ -229,9 +229,9 @@
+             // 音频开关
+             Toggle(isOn: $streamController.audioEnabled) {
+                 VStack(alignment: .leading, spacing: 2) {
+-                    Text("麦克风音频传输")
++                    Text("Microphone audio")
+                         .font(.subheadline)
+-                    Text("关闭后不采集麦克风，省电约 3-5%")
++                    Text("Turn off microphone capture to reduce power use.")
+                         .font(.caption)
+                         .foregroundColor(.secondary)
+                 }
+@@ -241,9 +241,9 @@
+             // 极简模式开关
+             Toggle(isOn: $streamController.minimalMode) {
+                 VStack(alignment: .leading, spacing: 2) {
+-                    Text("极简模式（关闭统计刷新）")
++                    Text("Minimal mode")
+                         .font(.subheadline)
+-                    Text("关闭帧率/码率/帧数统计刷新，省电约 2-3%")
++                    Text("Pause statistics updates to reduce power use.")
+                         .font(.caption)
+                         .foregroundColor(.secondary)
+                 }
+@@ -251,7 +251,7 @@
+             .disabled(streamController.isStreaming)
+ 
+             if streamController.isStreaming {
+-                Text("推流中无法切换设置，请先停止推流")
++                Text("Stop streaming before changing these settings.")
+                     .font(.caption)
+                     .foregroundColor(.orange)
+             }
+@@ -262,9 +262,9 @@
+                 set: { streamController.setWifiEnabled($0) }
+             )) {
+                 VStack(alignment: .leading, spacing: 2) {
+-                    Text("WiFi 推流")
++                    Text("Wi-Fi streaming")
+                         .font(.subheadline)
+-                    Text("关闭后仅 USB 推流更省电；开启后 OBS 媒体源可通过 rtsp 地址无线拉流")
++                    Text("Enable to stream wirelessly using the RTSP address. Disable for USB-only streaming.")
+                         .font(.caption)
+                         .foregroundColor(.secondary)
+                 }
+@@ -279,13 +279,13 @@
+ 
+     private var deviceInfoCard: some View {
+         VStack(alignment: .leading, spacing: 10) {
+-            Label("设备信息", systemImage: "info.circle")
++            Label("Device information", systemImage: "info.circle")
+                 .font(.headline)
+ 
+             Divider()
+ 
+             HStack {
+-                Text("设备型号")
++                Text("Device model")
+                     .foregroundColor(.secondary)
+                 Spacer()
+                 Text(streamController.deviceName)
+@@ -293,7 +293,7 @@
+             }
+ 
+             HStack {
+-                Text("当前规格")
++                Text("Current format")
+                     .foregroundColor(.secondary)
+                 Spacer()
+                 Text(streamController.currentFormat)
+@@ -302,24 +302,24 @@
+             }
+ 
+             HStack {
+-                Text("连接方式")
+-                    .foregroundColor(.secondary)
+-                Spacer()
+-                Text("USB 有线 / WiFi 无线")
++                Text("Connection")
++                    .foregroundColor(.secondary)
++                Spacer()
++                Text("USB / Wi-Fi")
+                     .fontWeight(.medium)
+             }
+ 
+             HStack {
+-                Text("局域网 IP")
+-                    .foregroundColor(.secondary)
+-                Spacer()
+-                Text(NetworkInfo.ipv4Addresses().isEmpty ? "未连接 WiFi" : NetworkInfo.ipv4Addresses().joined(separator: " "))
++                Text("Local IP address")
++                    .foregroundColor(.secondary)
++                Spacer()
++                Text(NetworkInfo.ipv4Addresses().isEmpty ? "Wi-Fi not connected" : NetworkInfo.ipv4Addresses().joined(separator: " "))
+                     .fontWeight(.medium)
+             }
+ 
+             if let ip = NetworkInfo.wifiIP() {
+                 HStack {
+-                    Text("WiFi 推流地址")
++                    Text("Wi-Fi stream URL")
+                         .foregroundColor(.secondary)
+                     Spacer()
+                     Text("rtsp://\(ip):\(RtspServer.defaultPort)/live")
+@@ -331,7 +331,7 @@
+             }
+ 
+             HStack {
+-                Text("监听端口")
++                Text("Server port")
+                     .foregroundColor(.secondary)
+                 Spacer()
+                 Text("2345 (USB) / \(RtspServer.defaultPort) (WiFi)")
+@@ -357,7 +357,7 @@
+                 HStack {
+                     Image(systemName: streamController.isStreaming ? "stop.circle.fill" : "play.circle.fill")
+                         .font(.title2)
+-                    Text(streamController.isStreaming ? "停止推流" : "开始推流")
++                    Text(streamController.isStreaming ? "Stop streaming" : "Start streaming")
+                         .font(.headline)
+                 }
+                 .frame(maxWidth: .infinity)
+@@ -371,7 +371,7 @@
+                 Button(action: {
+                     streamController.switchCamera()
+                 }) {
+-                    Label("切换摄像头", systemImage: "camera.rotate")
++                    Label("Camera", systemImage: "camera.rotate")
+                         .frame(maxWidth: .infinity)
+                         .padding()
+                         .background(Color(.systemGray5))
+@@ -383,7 +383,7 @@
+                 Button(action: {
+                     streamController.toggleTorch()
+                 }) {
+-                    Label(streamController.isTorchOn ? "关灯" : "闪光灯",
++                    Label(streamController.isTorchOn ? "Torch off" : "Torch",
+                           systemImage: streamController.isTorchOn ? "flashlight.on.fill" : "flashlight.off.fill")
+                         .frame(maxWidth: .infinity)
+                         .padding()
+@@ -396,7 +396,7 @@
+                 Button(action: {
+                     streamController.toggleScreenDim()
+                 }) {
+-                    Label(streamController.isScreenDimmed ? "恢复屏幕" : "息屏",
++                    Label(streamController.isScreenDimmed ? "Wake" : "Dim",
+                           systemImage: streamController.isScreenDimmed ? "sun.max.fill" : "moon.fill")
+                         .frame(maxWidth: .infinity)
+                         .padding()
+@@ -411,7 +411,7 @@
+             if streamController.isStreaming {
+                 VStack(alignment: .leading, spacing: 4) {
+                     HStack {
+-                        Text("缩放")
++                        Text("Zoom")
+                             .font(.caption)
+                             .foregroundColor(.secondary)
+                         Spacer()
+@@ -439,43 +439,43 @@
+ 
+     private var usageGuide: some View {
+         VStack(alignment: .leading, spacing: 10) {
+-            Label("使用说明", systemImage: "questionmark.circle")
++            Label("How to use", systemImage: "questionmark.circle")
+                 .font(.headline)
+ 
+             Divider()
+ 
+-            Text("USB 有线连接（OBS 插件）")
++            Text("USB connection (OBS plugin)")
+                 .font(.subheadline)
+                 .fontWeight(.semibold)
+ 
+             VStack(alignment: .leading, spacing: 8) {
+-                stepView(number: 1, text: "用数据线将 iPhone 连接到电脑")
+-                stepView(number: 2, text: "在 iPhone 上点击「信任此电脑」")
+-                stepView(number: 3, text: "确保电脑已安装 iTunes 或 Apple Devices")
+-                stepView(number: 4, text: "在「视频设置」中选择分辨率、方向和码率")
+-                stepView(number: 5, text: "App 打开后自动开始推流")
+-                stepView(number: 6, text: "在电脑端 OBS 中添加「iOS Camera」来源")
+-                stepView(number: 7, text: "启动 OBS 虚拟摄像头，在抖音直播伴侣中选择")
+-                stepView(number: 8, text: "推流中可点击「息屏」降低屏幕发热，快速双击屏幕中央唤醒")
+-            }
+-
+-            Divider()
+-
+-            Text("WiFi 无线连接（OBS 媒体源 / VLC）")
++                stepView(number: 1, text: "Connect the iPhone to your computer with a USB cable.")
++                stepView(number: 2, text: "Tap Trust This Computer on the iPhone.")
++                stepView(number: 3, text: "On Windows, install iTunes or Apple Devices.")
++                stepView(number: 4, text: "Choose the resolution, orientation and bitrate in Video settings.")
++                stepView(number: 5, text: "Streaming starts automatically when the app opens.")
++                stepView(number: 6, text: "In OBS on your computer, add an iOS Camera source.")
++                stepView(number: 7, text: "Start the OBS virtual camera and select it in your streaming app.")
++                stepView(number: 8, text: "Tap Dim screen to reduce screen heat. Double-tap the center to wake it.")
++            }
++
++            Divider()
++
++            Text("Wi-Fi connection (OBS / VLC)")
+                 .font(.subheadline)
+                 .fontWeight(.semibold)
+ 
+             VStack(alignment: .leading, spacing: 8) {
+-                stepView(number: 1, text: "iPhone 与电脑连接到同一个 WiFi")
+-                stepView(number: 2, text: "打开 App 并点击「开始推流」，记下「WiFi 推流地址」（如上所示）")
+-                stepView(number: 3, text: "在电脑端 OBS 中添加「媒体源」，输入该 rtsp 地址")
+-                stepView(number: 4, text: "勾选「网络缓冲」后点击播放，无需数据线即可看到画面")
+-                stepView(number: 5, text: "也可用 VLC 播放器直接打开该 rtsp 地址验证")
+-            }
+-
+-            Divider()
+-
+-            Text("提示：USB 与 WiFi 两种方式可同时使用；WiFi 画质取决于路由器与信号强度。")
++                stepView(number: 1, text: "Connect the iPhone and computer to the same Wi-Fi network.")
++                stepView(number: 2, text: "Tap Start streaming and copy the Wi-Fi stream URL shown above.")
++                stepView(number: 3, text: "In OBS, add a Media Source and enter the RTSP URL.")
++                stepView(number: 4, text: "Enable network buffering if needed, then start playback.")
++                stepView(number: 5, text: "You can also open the RTSP URL directly in VLC.")
++            }
++
++            Divider()
++
++            Text("USB and Wi-Fi can run together. Wireless quality depends on your router and signal strength.")
+                 .font(.caption)
+                 .foregroundColor(.secondary)
+         }
+--- a/project.yml
++++ b/project.yml
+@@ -7,8 +7,8 @@
+ settings:
+   base:
+     SWIFT_VERSION: "5.0"
+-    MARKETING_VERSION: "1.0"
+-    CURRENT_PROJECT_VERSION: "1"
++    MARKETING_VERSION: "1.5.1"
++    CURRENT_PROJECT_VERSION: "7"
+     CODE_SIGN_STYLE: Automatic
+     DEVELOPMENT_TEAM: ""
+     TARGETED_DEVICE_FAMILY: "1,2"
+@@ -29,9 +29,9 @@
+         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+-        INFOPLIST_KEY_NSCameraUsageDescription: 需要访问摄像头以用于 USB 虚拟摄像头直播
+-        INFOPLIST_KEY_NSMicrophoneUsageDescription: 需要访问麦克风以用于 USB 虚拟摄像头直播音频
+-        INFOPLIST_KEY_NSLocalNetworkUsageDescription: 需要本地网络权限以通过 USB 连接电脑进行视频传输
++        INFOPLIST_KEY_NSCameraUsageDescription: Allow camera access to stream video over USB or Wi-Fi.
++        INFOPLIST_KEY_NSMicrophoneUsageDescription: Allow microphone access to include audio in your USB or Wi-Fi stream.
++        INFOPLIST_KEY_NSLocalNetworkUsageDescription: Allow local network access to stream video to your computer.
+     scheme:
+       testTargets:
+         - AvoCamUSBTests
